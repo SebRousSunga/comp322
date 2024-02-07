@@ -50,53 +50,14 @@ void CreatePCB(int PCBid){
 void CreateChildPCB( int PCBid, int ParentPcbId ){
      process * childPCB = malloc(sizeof(process));
      
-     childPCB->ProcessID = PCBid;
-     childPCB->ParentPCB = PcbArray[ParentPcbId];
- 
-     process * PCBSearch = PcbArray[ParentPcbId];
-
-     if(PCBSearch->ChildPCB == NULL){ // Parent process has no inital child, start of linked list
-       
-       PCBSearch->ChildPCB = childPCB;
-       childPCB->SiblingPCB = NULL; // No siblings yet
-       childPCB->ChildPCB = NULL;
-     }
-     else{
-             PCBSearch = PCBSearch->ChildPCB;
-       while(PCBSearch->SiblingPCB != NULL){
-          PCBSearch = PCBSearch->SiblingPCB; // Go through linked list
-
-       }
-          PCBSearch->SiblingPCB = childPCB;
-          childPCB->SiblingPCB = NULL;
-          childPCB->ChildPCB = NULL;
-         // Found end of linked list
-       
-     }
-    
-     PcbArray[PCBid] = childPCB; 
+     
 };  // <--- 
 
 
 int DestroyPCB(int PCBid){ 
         // If process has no children or siblings at actually
-         process * Moron = PcbArray[PCBid];
-        if(Moron->ChildPCB == NULL && Moron->SiblingPCB == NULL){
-           PcbArray[PCBid] = NULL;
-           free(Moron);
-
-           
-
-       
-
-           return 1;
-        }
-        else if(Moron->SiblingPCB != NULL){
-           return DestroyPCB(Moron->SiblingPCB->ProcessID);
-        }
-	 else {
-	    return DestroyPCB(Moron->ChildPCB->ProcessID);	
-	 }
+        
+	 
     
 }; // <--- Recursive function
 // recursive go through child, then young sibling, set pointers to null
@@ -137,11 +98,9 @@ void print_proccesses(){
 
 int main(int argc, char *argv[]){
       
-      int user_argument = 0;
-      int process_num;
-      int proc_parent;
-      int process_num_init;
-       int Process_To_Destroy;
+      int UserArguement;
+      int ParentPCBChoice;
+      int PositionInArray = 0;
     
      while(user_argument != 4){
      print_proccesses();
@@ -155,22 +114,16 @@ int main(int argc, char *argv[]){
 
           switch(user_argument) {
           case 1: 
-          	       printf("Initilize process Hierarchy \n");
-          	       printf("Enter in process id: ");
-          	       scanf("%d", &process_num_init);
-          	       CreatePCB(process_num_init);
+          	       CreatePCB(PositionInArray);
+                   PositionInArray++;
           	       break;
           case 2:
-          	       printf("Create\n");
-          	       if(PcbArray[0] == NULL)
-          	       	printf(" DNE!");
-          	       else{
-          	       	 printf("Enter in id for process: ");
-          	       	 scanf("%d",&process_num);
-          	       	 printf("\nEnter parent of process %d: ",process_num);
-          	       	 scanf("%d",&proc_parent);
-          	       	 CreateChildPCB(process_num, proc_parent);
-          	       }
+          	       scanf("Enter in Parent %d", &ParentPCBChoice);
+                   if(PcbArray[ParentPCBChoice] == NULL)
+                     printf("Parent does not exist within Array");
+                    else{
+                        CreateChildPCB(PositionInArray,ParentPCBChoice);
+                    }
 
           	       break;
           case 3:
