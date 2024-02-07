@@ -11,7 +11,7 @@ typedef struct Process{
     int ProcessID;
     struct Process * ParentPCB;
     struct Process * ChildPCB;
-    struct Process * SiblingPCB;
+    
 
 } process;
 
@@ -40,16 +40,35 @@ void CreatePCB(int PCBid){
     PCB->ProcessID = PCBid;
     PCB->ParentPCB = NULL; // Points to nothing
     PCB->ChildPCB = NULL; // points to nothing at initilization
-    PCB->SiblingPCB = NULL; //Has no Siblings
+    
  
     PcbArray[PCBid] = PCB;	
 	
 };
 
 
-void CreateChildPCB( int PCBid, int ParentPcbId ){
+void CreateChildPCB( int PCBid, int ParentPCBid ){
      process * childPCB = malloc(sizeof(process));
+
+     childPCB->ProcessID = PCBid;
+     process * PCBSearch = PcbArray[ParentPCBid];
+     childPCB->ParentPCB = PcbArray[ParentPCBid];
+     if(PCBSearch->ChildPCB == NULL){
+        PCBSearch->ChildPCB = childPCB;
+        childPCB->ChildPCB = NULL;
+     }
      
+     else{
+         PCBSearch = PCBSearch->ChildPCB;
+
+         while(PCBSearch->ChildPCB != NULL){
+            PCBSearch->ChildPCB;
+         }
+          PCBSearch->ChildPCB = childPCB;
+          childPCB->ChildPCB = NULL;
+     }
+      
+     PcbArray[PCBid] = childPCB;
      
 };  // <--- 
 
@@ -78,8 +97,8 @@ void print_proccesses(){
 	       TempPCBpointer = TempPCBpointer->ChildPCB;
 	      while(TempPCBpointer != NULL){
 	        printf(" [%d] ",TempPCBpointer->ProcessID);
-            printf("In Memory: %p\n", TempPCBpointer );
-	        TempPCBpointer = TempPCBpointer->SiblingPCB;
+            TempPCBpointer = TempPCBpointer->ChildPCB;
+          
 	      }
 	      printf("\n");
 	      
@@ -101,36 +120,39 @@ int main(int argc, char *argv[]){
       int UserArguement;
       int ParentPCBChoice;
       int PositionInArray = 0;
+      int ProcessToDestroy;
     
-     while(user_argument != 4){
+     while(UserArguement != 4){
      print_proccesses();
      printf("\n Test program for abstraction of process creation, please enter in a numerical argument 1-5 \n");
      printf("------------------------------------------------------------------------------------------\n");
      printf("1. Initilize process heirchy. 2. Create child process. 3. Destroy process. 4. Quit out. \n");
      printf("User Input : ");
-     scanf("%d",&user_argument);
+     scanf("%d",&UserArguement);
 
-     printf("\n USER INPUT %d \n", user_argument);
+     printf("\n USER INPUT %d \n", UserArguement);
 
-          switch(user_argument) {
+          switch(UserArguement) {
           case 1: 
           	       CreatePCB(PositionInArray);
                    PositionInArray++;
           	       break;
           case 2:
-          	       scanf("Enter in Parent %d", &ParentPCBChoice);
+                   printf("Enter in Parent:");
+          	       scanf( "%d", &ParentPCBChoice);
                    if(PcbArray[ParentPCBChoice] == NULL)
-                     printf("Parent does not exist within Array");
+                     printf("\nParent does not exist within Array.\n");
                     else{
                         CreateChildPCB(PositionInArray,ParentPCBChoice);
+                        PositionInArray++;
                     }
 
           	       break;
           case 3:
           	    
           	      printf("Enter in Process to destroy \n");
-          	      scanf("%d",&Process_To_Destroy);
-          	      DestroyPCB(Process_To_Destroy);
+          	      scanf("%d",&ProcessToDestroy);
+          	      DestroyPCB(ProcessToDestroy);
           	      
           	      break;
           case 4:
