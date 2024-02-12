@@ -75,6 +75,15 @@ void CreateChildPCB( int PCBid, int ParentPCBid ){
 
 int DestroyPCB(int PCBid){ 
         // If process has no children or siblings at actually
+        if(PcbArray[PCBid]->ChildPCB == NULL){
+            PcbArray[PCBid]->ParentPCB->ChildPCB = NULL;
+            PcbArray[PCBid]->ParentPCB = NULL;
+            PcbArray[PCBid] = NULL;
+            free(PcbArray[PCBid]);
+        }
+
+         else
+            return DestroyPCB(PcbArray[PCBid]->ChildPCB->ProcessID);
         
 	 
     
@@ -90,11 +99,17 @@ void print_proccesses(){
 	    process * TempPCBpointer = PcbArray[i];
 	    printf("Process ID [%d]\n", TempPCBpointer->ProcessID);
         printf("In Memory: %p\n", TempPCBpointer);
+          if(TempPCBpointer->ParentPCB == NULL){
+            printf("No Parent Process\n");
+          }
+          else
+            printf("Parent Process: %d\n", TempPCBpointer->ParentPCB->ProcessID);
 	    
-        process * ChildTEMPpointer = TempPCBpointer->ChildPCB;
-	    if(ChildTEMPpointer != NULL){
+        
+	    if(TempPCBpointer->ChildPCB != NULL){
 	    printf("Child Processes ->");
-	       TempPCBpointer = TempPCBpointer->ChildPCB;
+
+	       TempPCBpointer = TempPCBpointer->ChildPCB; 
 	      while(TempPCBpointer != NULL){
 	        printf(" [%d] ",TempPCBpointer->ProcessID);
             TempPCBpointer = TempPCBpointer->ChildPCB;
@@ -152,7 +167,10 @@ int main(int argc, char *argv[]){
           	    
           	      printf("Enter in Process to destroy \n");
           	      scanf("%d",&ProcessToDestroy);
+                  if(PcbArray[ProcessToDestroy]->ParentPCB == NULL)
           	      DestroyPCB(ProcessToDestroy);
+                   else
+                    DestroyPCB(PcbArray[ProcessToDestroy]->ChildPCB->ProcessID);
           	      
           	      break;
           case 4:
