@@ -11,6 +11,7 @@ typedef struct Process{
     int ProcessID;
     struct Process * ParentPCB;
     struct Process * ChildPCB;
+    struct Process * SiblingPCB;
     
 
 } process;
@@ -27,10 +28,7 @@ void allocate_PcbArray(){
     }
 }
 
-// process state:
-//  0: ready
-//  1: running
-//  -1: blocked
+
 
 void CreatePCB(int PCBid){
 	// First ever process
@@ -40,6 +38,7 @@ void CreatePCB(int PCBid){
     PCB->ProcessID = PCBid;
     PCB->ParentPCB = NULL; // Points to nothing
     PCB->ChildPCB = NULL; // points to nothing at initilization
+    PCB->SiblingPCB = NULL;
     
  
     PcbArray[PCBid] = PCB;	
@@ -56,16 +55,19 @@ void CreateChildPCB( int PCBid, int ParentPCBid ){
      if(PCBSearch->ChildPCB == NULL){
         PCBSearch->ChildPCB = childPCB;
         childPCB->ChildPCB = NULL;
+        childPCB->SiblingPCB = NULL; 
      }
      
-     else{
+     else{ //Parent Process already has children
          PCBSearch = PCBSearch->ChildPCB;
 
-         while(PCBSearch->ChildPCB != NULL){
-            PCBSearch->ChildPCB;
+         while(PCBSearch->SiblingPCB != NULL){
+            PCBSearch->SiblingPCB;
          }
-          PCBSearch->ChildPCB = childPCB;
+          PCBSearch->SiblingPCB = childPCB;
           childPCB->ChildPCB = NULL;
+          childPCB->SiblingPCB = NULL;
+
      }
       
      PcbArray[PCBid] = childPCB;
@@ -112,7 +114,7 @@ void print_proccesses(){
 	       TempPCBpointer = TempPCBpointer->ChildPCB; 
 	      while(TempPCBpointer != NULL){
 	        printf(" [%d] ",TempPCBpointer->ProcessID);
-            TempPCBpointer = TempPCBpointer->ChildPCB;
+            TempPCBpointer = TempPCBpointer->SiblingPCB;
           
 	      }
 	      printf("\n");
