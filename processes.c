@@ -12,6 +12,7 @@ typedef struct Process{
     struct Process * ParentPCB;
     struct Process * ChildPCB;
     struct Process * SiblingPCB;
+    struct Process * OldPCB;
     
 
 } process;
@@ -39,6 +40,7 @@ void CreatePCB(int PCBid){
     PCB->ParentPCB = NULL; // Points to nothing
     PCB->ChildPCB = NULL; // points to nothing at initilization
     PCB->SiblingPCB = NULL;
+    PCB->OldPCB = NULL;
     
  
     PcbArray[PCBid] = PCB;	
@@ -56,6 +58,7 @@ void CreateChildPCB( int PCBid, int ParentPCBid ){
         PCBSearch->ChildPCB = childPCB;
         childPCB->ChildPCB = NULL;
         childPCB->SiblingPCB = NULL; 
+        childPCB->OldPCB = NULL;
      }
      
      else{ //Parent Process already has children
@@ -65,6 +68,7 @@ void CreateChildPCB( int PCBid, int ParentPCBid ){
             PCBSearch->SiblingPCB;
          }
           PCBSearch->SiblingPCB = childPCB;
+          childPCB->OldPCB = PCBSearch;
           childPCB->ChildPCB = NULL;
           childPCB->SiblingPCB = NULL;
 
@@ -77,15 +81,17 @@ void CreateChildPCB( int PCBid, int ParentPCBid ){
 
 int DestroyPCB(int PCBid){ 
         // If process has no children or siblings at actually
-        if(PcbArray[PCBid]->ChildPCB == NULL){
+        if(PcbArray[PCBid]->SiblingPCB == NULL){
             PcbArray[PCBid]->ParentPCB->ChildPCB = NULL;
             PcbArray[PCBid]->ParentPCB = NULL;
+            PcbArray[PCBid]->OldPCB->SiblingPCB = NULL;
+            PcbArray[PCBid]->OldPCB = NULL;
             PcbArray[PCBid] = NULL;
             free(PcbArray[PCBid]);
         }
 
          else
-            return DestroyPCB(PcbArray[PCBid]->ChildPCB->ProcessID);
+            return DestroyPCB(PcbArray[PCBid]->SiblingPCB->ProcessID);
         
 	 
     
@@ -167,12 +173,9 @@ int main(int argc, char *argv[]){
           	       break;
           case 3:
           	    
-          	      printf("Enter in Process to destroy \n");
+          	      printf("Enter in Process to destroy children \n");
           	      scanf("%d",&ProcessToDestroy);
-                  if(PcbArray[ProcessToDestroy]->ParentPCB == NULL)
-          	      DestroyPCB(ProcessToDestroy);
-                   else
-                    DestroyPCB(PcbArray[ProcessToDestroy]->ChildPCB->ProcessID);
+                  DestroyPCB(PcbArray[ProcessToDestroy]->ChildPCB->ProcessID);
           	      
           	      break;
           case 4:
