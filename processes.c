@@ -58,7 +58,7 @@ void CreateChildPCB( int PCBid, int ParentPCBid ){
         PCBSearch->ChildPCB = childPCB;
         childPCB->ChildPCB = NULL;
         childPCB->SiblingPCB = NULL; 
-        childPCB->OldPCB = NULL;
+        
      }
      
      else{ //Parent Process already has children
@@ -68,7 +68,7 @@ void CreateChildPCB( int PCBid, int ParentPCBid ){
             PCBSearch->SiblingPCB;
          }
           PCBSearch->SiblingPCB = childPCB;
-          childPCB->OldPCB = PCBSearch;
+       ;
           childPCB->ChildPCB = NULL;
           childPCB->SiblingPCB = NULL;
 
@@ -84,12 +84,13 @@ int DestroyPCB(int PCBid){
         if(PcbArray[PCBid]->SiblingPCB == NULL){
             PcbArray[PCBid]->ParentPCB->ChildPCB = NULL;
             PcbArray[PCBid]->ParentPCB = NULL;
-            PcbArray[PCBid]->OldPCB->SiblingPCB = NULL;
-            PcbArray[PCBid]->OldPCB = NULL;
+            
             PcbArray[PCBid] = NULL;
             free(PcbArray[PCBid]);
         }
-
+          else if(PcbArray[PCBid]->ChildPCB != NULL){
+            return DestroyPCB(PcbArray[PCBid]->ChildPCB->ProcessID);
+          }
          else
             return DestroyPCB(PcbArray[PCBid]->SiblingPCB->ProcessID);
         
